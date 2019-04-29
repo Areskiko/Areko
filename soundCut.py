@@ -76,22 +76,22 @@ choices = {"Select Local File":"SLF", "Youtube Link":"YL"}
 tkvar.set("Select Method")
 tkvar.trace('w', edit)
 
-optionsMenu = OptionMenu(selectionFrame, tkvar, bg="black", fg="white", activebackground='black', activeforeground='white', *choices)
+optionsMenu = OptionMenu(selectionFrame, tkvar, *choices)
 optionsMenu.pack(fill=X)
 
 
-pathEntry = Entry(selectionFrame, bg="black", fg="white")
+pathEntry = Entry(selectionFrame)
 #pathEntry.grid(row=0)
 pathEntry.pack(side=LEFT, fill=X, expand=1)
 
-selectButton = Button(selectionFrame, text="Browse", command=browse, bg="black", fg="white")
+selectButton = Button(selectionFrame, text="Browse")
 #selectButton.grid(row=0, column=1)
 selectButton.pack(side=RIGHT)
 
 
-label = Label(mainFrame, text="MainFrame", bg="black", fg="white")
+label = Label(mainFrame, text="MainFrame")
 label.pack()
-exportLabel = Label(exportFrame, text="ExportFrame", bg="black", fg="white")
+exportLabel = Label(exportFrame, text="ExportFrame")
 exportLabel.pack()
 
 
