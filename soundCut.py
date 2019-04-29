@@ -54,7 +54,7 @@ def edit(*args):
         pathEntry.insert(0, "Enter path to file, or click browse to find")
     else:
         pathEntry.delete(0, END)
-        pathEntry.insert(0, "Click browse to open youtube and copy link to video here")
+        pathEntry.insert(0, "Click browse to open youtube and copy the link to the video here")
 
 root = Tk()
 root.geometry("500x500")
@@ -62,7 +62,7 @@ root.geometry("500x500")
 
 
 selectionFrame = Frame(root)
-selectionFrame.pack(side=TOP)
+selectionFrame.pack(side=TOP, fill=X)
 
 mainFrame = Frame(root)
 mainFrame.pack()
@@ -73,25 +73,25 @@ exportFrame.pack(side=BOTTOM)
 
 tkvar = StringVar(root)
 choices = {"Select Local File":"SLF", "Youtube Link":"YL"}
-tkvar.set("Youtube Link")
+tkvar.set("Select Method")
 tkvar.trace('w', edit)
 
-optionsMenu = OptionMenu(selectionFrame, tkvar, *choices)
-optionsMenu.pack()
+optionsMenu = OptionMenu(selectionFrame, tkvar, bg="black", fg="white", activebackground='black', activeforeground='white', *choices)
+optionsMenu.pack(fill=X)
 
 
-pathEntry = Entry(selectionFrame)
-pathEntry.grid(row=0)
-pathEntry.pack()
+pathEntry = Entry(selectionFrame, bg="black", fg="white")
+#pathEntry.grid(row=0)
+pathEntry.pack(side=LEFT, fill=X, expand=1)
 
-selectButton = Button(selectionFrame, text="Browse", command=browse )
-selectButton.grid(row=0, column=1)
-selectButton.pack()
+selectButton = Button(selectionFrame, text="Browse", command=browse, bg="black", fg="white")
+#selectButton.grid(row=0, column=1)
+selectButton.pack(side=RIGHT)
 
 
-label = Label(mainFrame, text="MainFrame")
+label = Label(mainFrame, text="MainFrame", bg="black", fg="white")
 label.pack()
-exportLabel = Label(exportFrame, text="ExportFrame")
+exportLabel = Label(exportFrame, text="ExportFrame", bg="black", fg="white")
 exportLabel.pack()
 
 
