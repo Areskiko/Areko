@@ -1,3 +1,4 @@
+# pylint: disable=unused-wildcard-import
 from youtube_dl import YoutubeDL
 import pydub
 import subprocess
@@ -8,6 +9,11 @@ from tkinter import *
 from functools import partial
 import webbrowser
 url = "https://www.youtube.com/"
+import math
+import time
+import threading
+import ntpath
+import datetime
 
 tempTitle = "temporary"
 
@@ -49,10 +55,10 @@ def edit(*args):
     global mode
     mode = tkvar.get()
     if mode == "Youtube Link":
-        pathSrtingVar.set("Click browse to open youtube and copy the link to the video here")
+        pathSrtingVar.set("Youtube link")
 
     else:
-        pathSrtingVar.set("Enter path to file, or click browse to find")
+        pathSrtingVar.set("Path to file")
         
 def resize(*args):
     cont = pathSrtingVar.get()
@@ -60,68 +66,157 @@ def resize(*args):
     #pathEntry.update()
 
 class Section():
-    def __init__(self, audio):
+    def __init__(self, audio, path):
         self.songContent = audio
         self.songLength = self.songContent.__len__()/1000
-        self.smolFrame = Frame(mainFrame)
+        self.smolFrame = Frame(mainFrame, pady=5)
         self.smolFrame.pack()
 
-        Label(self.smolFrame, text="Selection {}".format(len(selections))).pack(side=TOP)
+        Label(self.smolFrame, text=(ntpath.split(path)[1])[:40], width=38, font="Arial 10 bold" ).grid(row=0, column=0, columnspan=3, sticky="W")
 
-        s = Scale(self.smolFrame, orient=HORIZONTAL, from_=0, to=self.songLength)
-        s.pack()
+        self.deleteButton = Button(self.smolFrame, text="Remove")
+        self.deleteButton.grid(row=1, column=2, sticky="E")
 
-        s2 = Scale(self.smolFrame, orient=HORIZONTAL, from_=0, to=self.songLength)
-        s2.pack()
+        self.inverted = BooleanVar()
+        self.inverted.set(False)
+        self.reverseBox = Checkbutton(self.smolFrame, text="Invert Selection", variable=self.inverted, onvalue=True, offvalue=False)
+        self.reverseBox.grid(row=2, column=2, sticky="E")
+
+        self.lab1 = Label(self.smolFrame, text="From 0:0")
+        self.lab1.grid(row=1, column=1, sticky="W")
+
+        self.s = Scale(self.smolFrame, orient=HORIZONTAL, from_=0, to=self.songLength, command=self.updt1, showvalue=0, length=100)
+        self.s.bind("<Button-1>", self.take_focus_1)
+        self.s.grid(row=1, column=0, sticky="W")
+
+        self.lab2 = Label(self.smolFrame, text="To 0:0")
+        self.lab2.grid(row=2, column=1, sticky="W")
+
+        self.s2 = Scale(self.smolFrame, orient=HORIZONTAL, from_=0, to=self.songLength, command=self.updt2, showvalue=0, length=100)
+        self.s2.bind("<Button-1>", self.take_focus_2)
+        self.s2.grid(row=2, column=0, sticky="W")
+    
+    def take_focus_1(self, event):
+        self.s.focus_set()
+    def take_focus_2(self, event):
+        self.s2.focus_set()
+
+    def updt1(self, val):
+        val= int(val)
+        try:
+            hms = str(datetime.timedelta(seconds=val)).split(":")
+            minutes = (hms[1])
+            seconds = int(hms[2])
+            fromTime = "From {}:{}".format(minutes, seconds)
+        except NameError:
+            fromTime = "To 0:0"
+        self.lab1.config(text=fromTime)
+        if self.s2.get() < val:
+            self.s2.set(val+1)
+
+    def updt2(self, val):
+        val= int(val)
+        try:
+            hms = str(datetime.timedelta(seconds=val)).split(":")
+            minutes = (hms[1])
+            seconds = int(hms[2])
+            fromTime = "From {}:{}".format(minutes, seconds)
+        except NameError:
+            fromTime = "To 0:0"
+        self.lab2.config(text=fromTime)
+        if val < self.s.get():
+            self.s2.set(self.s.get()+1)
+
+
 
 
 def start(*args):
+    loadingLable['text'] = "Loading"
     path = pathSrtingVar.get()
     if os.path.isfile(path):
-        with open(path, 'rb') as f:
-            songContent = pydub.AudioSegment.from_mp3(path)
-            sect = Section(songContent)
-            global selections
-            selections.append(sect)
-
-            
-            
+        threading.Thread(target=load).start()
     else:
-        pass
+        loadingLable.config(text="")
+    
+def load():
+    path = pathSrtingVar.get()
+    songContent = pydub.AudioSegment.from_mp3(path)
+    sect = Section(songContent, path)
+    global selections
+    selections.append(sect)
+    loadingLable.config(text="")
 
+def exportBrowse():
+    exportPathVar.set(filedialog.askdirectory())
+
+def export():
+    if (os.path.exists(exportPathVar.get())) and (not os.path.isfile(exportPathVar.get())):
+        if exportNameVar.get == "":
+            exportNameVar.set("example")
+        whole = pydub.AudioSegment.empty()
+        for sect in selections:
+            segmentStart = sect.s.get()*1000
+            segmentEnd = sect.s2.get()*1000
+            if sect.inverted.get():
+                firstSegment = sect.songContent[:segmentStart]
+                secondSegment = sect.songContent[segmentEnd:]
+                whole+=firstSegment
+                whole+=secondSegment
+            else:
+                segment = sect.songContent[segmentStart:segmentEnd]
+                whole+=segment
+        name = exportNameVar.get().replace(".mp3", "")
+        whole.export(exportPathVar.get()+"/"+name+".mp3", format="mp3")
+        exportLabel['text'] = "Complete"
+        time.sleep(5)
+        exportLabel['text'] = ""
+    else:
+        exportBrowse()
+
+def exportThread():
+    exportLabel['text'] = "Exporting"
+    threading.Thread(target=export).start()
 #Start of App
 root = Tk()
 #root.geometry("500x500")
 
 #Non work frame
 topFrame = Frame(root)
-topFrame.pack(side=TOP, fill=X)
+topFrame.pack(fill=X)
 
 #Title
-title = Label(topFrame, text="Areko", font=("Arial", 16))
-title.grid(row=0, column=1)
+menuFrame = Frame(topFrame)
+menuFrame.pack(expand=1)
+title = Label(menuFrame, text="Areko", font=("Arial", 16))
+title.pack(side=TOP)
 
 #Method Choice
-tkvar = StringVar(topFrame)
+tkvar = StringVar(menuFrame)
 choices = {"Select Local File":"SLF", "Youtube Link":"YL"}
 tkvar.set("Select Mode")
 tkvar.trace('w', edit)
 
-optionsMenu = OptionMenu(topFrame, tkvar, *choices)
-optionsMenu.grid(row=2, column=1)
+optionsMenu = OptionMenu(menuFrame, tkvar, *choices)
+optionsMenu.pack(side=TOP)
 
 
 #Path input and Browse button
-pathSrtingVar = StringVar(topFrame)
-pathSrtingVar.trace('w', resize)
-pathEntry = Entry(topFrame, text=pathSrtingVar)
-pathEntry.grid(row=3, column=1, ipadx=120)
+pathSrtingVar = StringVar(menuFrame)
+#pathSrtingVar.trace('w', resize)
+pathEntry = Entry(menuFrame, text=pathSrtingVar)
+pathEntry.pack(side=LEFT)
 
-selectButton = Button(topFrame, text="Browse", command=browse)
-selectButton.grid(row=3, column=2)
+selectButton = Button(menuFrame, text="Browse", command=browse)
+selectButton.pack(side=LEFT)
 
-startButton = Button(topFrame, text="Select", command=start)
-startButton.grid(row=3, column=3)
+startButton = Button(menuFrame, text="Add", command=start)
+startButton.pack(side=LEFT)
+
+#Loading Warning
+loadingFrame = Frame(root)
+loadingFrame.pack(fill=X)
+loadingLable = Label(loadingFrame)
+loadingLable.pack(side=TOP)
 
 
 #Working Frame
@@ -130,5 +225,34 @@ mainFrame.pack(fill=X)
 
 selections = []
 
+
+
+#Export Frame
+exportFrame = Frame(root)
+exportFrame.pack(side=BOTTOM)
+
+exportPathVar = StringVar(exportFrame)
+exportNameVar = StringVar(exportFrame)
+
+topExportFrame = Frame(exportFrame)
+topExportFrame.pack(side=TOP)
+
+Label(topExportFrame, text="Folder").pack(side=LEFT)
+pathEntry = Entry(topExportFrame, text=exportPathVar)
+pathEntry.pack(side=LEFT)
+selectButton = Button(topExportFrame, text="Browse", command=exportBrowse)
+selectButton.pack(side=LEFT)
+
+bottomExportFrame = Frame(exportFrame)
+bottomExportFrame.pack(side=BOTTOM)
+
+Label(bottomExportFrame, text="Name").pack(side=LEFT)
+nameEntry = Entry(bottomExportFrame, text=exportNameVar)
+nameEntry.pack(side=LEFT)
+exportButton = Button(bottomExportFrame, text="Export", command=exportThread)
+exportButton.pack(side=LEFT)
+
+exportLabel = Label(bottomExportFrame, text="")
+exportLabel.pack(side=BOTTOM)
 
 root.mainloop()
