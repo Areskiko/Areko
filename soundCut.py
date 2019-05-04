@@ -11,7 +11,7 @@ url = "https://www.youtube.com/"
 
 tempTitle = "temporary"
 
-mode ="Youtube Link"
+mode ="Select Local File"
 
 #youtube_dl can't find ffmpeg so converting manually
 def convert(fileInput, fileOutput):
@@ -38,62 +38,97 @@ def openFileExplorer():
     return filedialog.askopenfilename( filetypes = ( ("MP3 Format", "*.mp3"), ("All Files", "*.*") ) )
 
 def browse():
-    if mode =="Select Local File":
-        path = openFileExplorer()
-        pathEntry.delete(0, END)
-        pathEntry.insert(0, path)
+    if mode =="Youtube Link":
+        webbrowser.open(url)
 
     else:
-        webbrowser.open(url)
+        path = openFileExplorer()
+        pathSrtingVar.set(path)
         
 def edit(*args):
     global mode
     mode = tkvar.get()
-    if mode == "Select Local File":
-        pathEntry.delete(0, END)
-        pathEntry.insert(0, "Enter path to file, or click browse to find")
+    if mode == "Youtube Link":
+        pathSrtingVar.set("Click browse to open youtube and copy the link to the video here")
+
     else:
-        pathEntry.delete(0, END)
-        pathEntry.insert(0, "Click browse to open youtube and copy the link to the video here")
+        pathSrtingVar.set("Enter path to file, or click browse to find")
+        
+def resize(*args):
+    cont = pathSrtingVar.get()
+    pathEntry.grid(row=3, column=1, ipadx=len(cont)*2)
+    #pathEntry.update()
 
+class Section():
+    def __init__(self, audio):
+        self.songContent = audio
+        self.songLength = self.songContent.__len__()/1000
+        self.smolFrame = Frame(mainFrame)
+        self.smolFrame.pack()
+
+        Label(self.smolFrame, text="Selection {}".format(len(selections))).pack(side=TOP)
+
+        s = Scale(self.smolFrame, orient=HORIZONTAL, from_=0, to=self.songLength)
+        s.pack()
+
+        s2 = Scale(self.smolFrame, orient=HORIZONTAL, from_=0, to=self.songLength)
+        s2.pack()
+
+
+def start(*args):
+    path = pathSrtingVar.get()
+    if os.path.isfile(path):
+        with open(path, 'rb') as f:
+            songContent = pydub.AudioSegment.from_mp3(path)
+            sect = Section(songContent)
+            global selections
+            selections.append(sect)
+
+            
+            
+    else:
+        pass
+
+#Start of App
 root = Tk()
-root.geometry("500x500")
+#root.geometry("500x500")
 
+#Non work frame
+topFrame = Frame(root)
+topFrame.pack(side=TOP, fill=X)
 
+#Title
+title = Label(topFrame, text="Areko", font=("Arial", 16))
+title.grid(row=0, column=1)
 
-selectionFrame = Frame(root)
-selectionFrame.pack(side=TOP, fill=X)
-
-mainFrame = Frame(root)
-mainFrame.pack()
-
-exportFrame = Frame(root)
-exportFrame.pack(side=BOTTOM)
-
-
-tkvar = StringVar(root)
+#Method Choice
+tkvar = StringVar(topFrame)
 choices = {"Select Local File":"SLF", "Youtube Link":"YL"}
-tkvar.set("Select Method")
+tkvar.set("Select Mode")
 tkvar.trace('w', edit)
 
-optionsMenu = OptionMenu(selectionFrame, tkvar, *choices)
-optionsMenu.pack(fill=X)
+optionsMenu = OptionMenu(topFrame, tkvar, *choices)
+optionsMenu.grid(row=2, column=1)
 
 
-pathEntry = Entry(selectionFrame)
-#pathEntry.grid(row=0)
-pathEntry.pack(side=LEFT, fill=X, expand=1)
+#Path input and Browse button
+pathSrtingVar = StringVar(topFrame)
+pathSrtingVar.trace('w', resize)
+pathEntry = Entry(topFrame, text=pathSrtingVar)
+pathEntry.grid(row=3, column=1, ipadx=120)
 
-selectButton = Button(selectionFrame, text="Browse")
-#selectButton.grid(row=0, column=1)
-selectButton.pack(side=RIGHT)
+selectButton = Button(topFrame, text="Browse", command=browse)
+selectButton.grid(row=3, column=2)
+
+startButton = Button(topFrame, text="Select", command=start)
+startButton.grid(row=3, column=3)
 
 
-label = Label(mainFrame, text="MainFrame")
-label.pack()
-exportLabel = Label(exportFrame, text="ExportFrame")
-exportLabel.pack()
+#Working Frame
+mainFrame = Frame(root)
+mainFrame.pack(fill=X)
 
+selections = []
 
 
 root.mainloop()
