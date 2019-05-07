@@ -7,7 +7,7 @@
 
 ## Single-file mp3 cutter and concatinator
 
-Standalone file, no installation. Currently supports cutting up mp3 files and adding them together, multiple files may be used.
+Standalone file, no installation. GUI application that currently supports cutting up mp3 files and adding them together, multiple files may be used.
 
 ## Youtube downloader
 
