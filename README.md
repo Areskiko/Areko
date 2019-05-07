@@ -1,6 +1,8 @@
 # Areko
 
-*[Singe-File mp3 Cutter and concatinator](#Single-file  "Goto Single-file")
+*[Singe-File mp3 Cutter and concatinator](#single-file-mp3-cutter-and-concatinator  "Goto single-file-mp3-cutter-and-concatinator")
+*[Youtube downloader](#youtube-downloader "Goto youtube-downloader")
+*[Dependencies](#dependencies "Goto dependencies")
 
 
 ## Single-file mp3 cutter and concatinator
