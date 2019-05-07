@@ -7,5 +7,4 @@ Currently supports cutting up mp3 files and adding them together, multiple files
 
 
 Dependencies:
-Youtube-dl
-Pydub
+Youtube-dl, Pydub
