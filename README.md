@@ -21,6 +21,11 @@ Also supports Youtube Urls, but has to download them so there's a longer load ti
 
 ## Dependencies
 
-[Youtube-dl](https://github.com/ytdl-org/youtube-dl/blob/master/README.md)
+* [Youtube-dl](https://github.com/ytdl-org/youtube-dl/blob/master/README.md)
 
-[Pydub](https://github.com/jiaaro/pydub)
+* [Pydub](https://github.com/jiaaro/pydub) by Jiaaro
+  * Released unter the MIT License
+
+## License ([GNU General Public License v3.0](https://github.com/Areskiko/Areko/blob/master/LICENSE))
+
+As disclosed in the GNU v3 License, You are hereby granted permission to modify, distribute, and use this software. However any redistribution must disclose the source, state changes, and be under the same license. This means you cannot create closed-source distributions.
