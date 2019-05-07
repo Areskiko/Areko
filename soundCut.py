@@ -15,7 +15,7 @@ import threading
 import ntpath
 import datetime
 
-tempTitle = "temporary"
+tempTitle = "video_from_youtube"
 
 mode ="Select Local File"
 
@@ -67,6 +67,7 @@ def resize(*args):
 
 class Section():
     def __init__(self, audio, path):
+        self.ID = len(selections)
         self.songContent = audio
         self.songLength = self.songContent.__len__()/1000
         self.smolFrame = Frame(mainFrame, pady=5)
@@ -74,7 +75,7 @@ class Section():
 
         Label(self.smolFrame, text=(ntpath.split(path)[1])[:40], width=38, font="Arial 10 bold" ).grid(row=0, column=0, columnspan=3, sticky="W")
 
-        self.deleteButton = Button(self.smolFrame, text="Remove")
+        self.deleteButton = Button(self.smolFrame, text="Remove", command=lambda: delete(self.smolFrame, self.ID))
         self.deleteButton.grid(row=1, column=2, sticky="E")
 
         self.inverted = BooleanVar()
@@ -109,7 +110,7 @@ class Section():
             seconds = int(hms[2])
             fromTime = "From {}:{}".format(minutes, seconds)
         except NameError:
-            fromTime = "To 0:0"
+            fromTime = "From 0:0"
         self.lab1.config(text=fromTime)
         if self.s2.get() < val:
             self.s2.set(val+1)
@@ -120,26 +121,39 @@ class Section():
             hms = str(datetime.timedelta(seconds=val)).split(":")
             minutes = (hms[1])
             seconds = int(hms[2])
-            fromTime = "From {}:{}".format(minutes, seconds)
+            fromTime = "To {}:{}".format(minutes, seconds)
         except NameError:
             fromTime = "To 0:0"
         self.lab2.config(text=fromTime)
         if val < self.s.get():
             self.s2.set(self.s.get()+1)
 
+def delete(frame, ID):
+    frame.destroy()
+    del selections[ID]
 
 
 
 def start(*args):
     loadingLable['text'] = "Loading"
-    path = pathSrtingVar.get()
-    if os.path.isfile(path):
-        threading.Thread(target=load).start()
+    if mode == "Select Local File":
+        path = pathSrtingVar.get()
+        if os.path.isfile(path):
+            threading.Thread(target=load, args=pathSrtingVar.get()).start()
+        else:
+            loadingLable.config(text="")
     else:
-        loadingLable.config(text="")
+        YtLoadThread(pathSrtingVar.get())
+
+def YtLoadThread(path):
+    threading.Thread(target=LoadYt, args=(path,)).start()
+
+def LoadYt(path):
+    downloadMp3(path)
+    load(tempTitle+".mp3")
+
     
-def load():
-    path = pathSrtingVar.get()
+def load(path):
     songContent = pydub.AudioSegment.from_mp3(path)
     sect = Section(songContent, path)
     global selections
@@ -256,3 +270,7 @@ exportLabel = Label(bottomExportFrame, text="")
 exportLabel.pack(side=BOTTOM)
 
 root.mainloop()
+if os.path.isfile(tempTitle+".mp3"):
+    os.remove(tempTitle+".mp3")
+if os.path.isfile(tempTitle+".mp4"):
+    os.remove(tempTitle+".mp4")
