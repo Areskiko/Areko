@@ -4,5 +4,6 @@
 
 Currently supports cutting up mp3 files and adding them together, multiple files may be used. Also supports Youtube Urls, but has to download them so there's a longer load time
 
-Dependencies:
+## Dependencies
+
 Youtube-dl, Pydub
