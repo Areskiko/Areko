@@ -28,6 +28,10 @@ Also supports Youtube Urls, but has to download them so there's a longer load ti
   * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
   **The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.**
 
+* [FFmpeg](https://ffmpeg.org/)
+  * Only necessary if you want to use the youtube download functionality
+  * Download manually and place it's directory in your systemns PATH
+  
 ## License ([GNU General Public License v3.0](https://github.com/Areskiko/Areko/blob/master/LICENSE))
 
 Copyright © 2019 Stefan Mack, [github.com/areskiko](https://github.com/Areskiko)
