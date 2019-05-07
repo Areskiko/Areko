@@ -21,6 +21,6 @@ Also supports Youtube Urls, but has to download them so there's a longer load ti
 
 ## Dependencies
 
-[Youtube-dl](https://github.com/ytdl-org/youtube-dl/blob/master/README.md#readme)
+[Youtube-dl](https://github.com/ytdl-org/youtube-dl/blob/master/README.md)
 
 [Pydub](https://github.com/jiaaro/pydub)
