@@ -24,7 +24,7 @@ mode ="Select Local File"
 #youtube_dl can't find ffmpeg so converting manually
 def convert(fileInput, fileOutput):
     cmds = ['ffmpeg', '-i', fileInput, fileOutput, "-loglevel", "quiet", "-y"]
-    subprocess.call(cmds)
+    subprocess.Popen(cmds)
 
 def downloadMp3(video):
     ydl_opts = {
