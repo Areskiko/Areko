@@ -37,9 +37,16 @@ def downloadMp3(video):
 
     info_dict = ydl.extract_info(video, download=False)
     video_title = info_dict.get('title', None)
-    print(video_title)
 
     convert(tempTitle+".mp4", tempTitle+".mp3")
+    while not os.path.isfile(tempTitle+".mp3"):
+        pass
+    while True:
+        try:
+            os.rename(tempTitle+".mp4", tempTitle+".mp4")
+            break
+        except WindowsError:
+            pass
     os.remove(tempTitle+".mp4")
 
 def openFileExplorer():
