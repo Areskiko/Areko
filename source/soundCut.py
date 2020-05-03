@@ -38,8 +38,8 @@ def downloadMp3(video):
     info_dict = ydl.extract_info(video, download=False)
     video_title = info_dict.get('title', None)
 
-    convert(tempTitle+".mp4", tempTitle+".mp3")
-    while not os.path.isfile(tempTitle+".mp3"):
+    convert(tempTitle+".mp4", video_title+".mp3")
+    while not os.path.isfile(video_title+".mp3"):
         pass
     while True:
         try:
