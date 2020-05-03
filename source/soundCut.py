@@ -15,6 +15,7 @@ import threading
 import ntpath
 import datetime
 import logging
+subprocess.run
 logging.basicConfig(filename='areko.log', filemode='a', format='%(levelname)s - %(message)s')
 
 tempTitle = "video_from_youtube"
@@ -38,8 +39,8 @@ def downloadMp3(video):
     info_dict = ydl.extract_info(video, download=False)
     video_title = info_dict.get('title', None)
 
-    convert(tempTitle+".mp4", video_title+".mp3")
-    while not os.path.isfile(video_title+".mp3"):
+    convert(tempTitle+".mp4", tempTitle+".mp3")
+    while not os.path.isfile(tempTitle+".mp3"):
         pass
     while True:
         try:
@@ -148,7 +149,7 @@ def start(*args):
         if mode == "Select Local File":
             path = pathSrtingVar.get()
             if os.path.isfile(path):
-                threading.Thread(target=load, args=(pathSrtingVar.get(),)).start()
+                threading.Thread(target=load, daemon=True, args=(pathSrtingVar.get(),)).start()
             else:
                 loadingLable.config(text="")
         else:
@@ -160,7 +161,7 @@ def start(*args):
 
 def YtLoadThread(path):
     try:
-        threading.Thread(target=LoadYt, args=(path,)).start()
+        threading.Thread(target=LoadYt, daemon=True, args=(path,)).start()
     except Exception as e:
         logging.error(e)
         loadingLable['text'] = "Unexpected Error, see error log"
@@ -218,7 +219,7 @@ def export():
 def exportThread():
     try:
         exportLabel['text'] = "Exporting"
-        threading.Thread(target=export).start()
+        threading.Thread(target=export, daemon=True).start()
     except Exception as e:
         logging.error(e)
         loadingLable['text'] = "Unexpected Error, see error log"
